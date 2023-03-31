@@ -34,26 +34,45 @@ class _GetLocationState extends State<GetLocation> {
     setState(() {
       _currentPosition = position;
     });
-    if(_currentPosition?.latitude != null){
+    if (_currentPosition?.latitude != null) {
       var lat = _currentPosition?.latitude;
       var lon = _currentPosition?.longitude;
-      locationName = await getLocationName(lat!,lon!);
+      locationName = await getLocationName(lat!, lon!);
       // debugPrint(locationName);
-      Fluttertoast.showToast(msg: locationName,toastLength: Toast.LENGTH_SHORT);
+      Fluttertoast.showToast(
+        msg: locationName,
+        toastLength: Toast.LENGTH_SHORT,
+        backgroundColor: Colors.black54,
+      );
     }
   }
 
-
-
   Future<String> getLocationName(double latitude, double longitude) async {
     List<Placemark> placemarks =
-    await placemarkFromCoordinates(latitude, longitude);
+        await placemarkFromCoordinates(latitude, longitude);
     Placemark placemark = placemarks[0];
+    String subLocality = placemark.subLocality ?? '';
+    String subFace = placemark.subThoroughfare ?? '';
+    String fare = placemark.thoroughfare ?? '';
+    String isoCode = placemark.isoCountryCode ?? '';
+    String postal = placemark.postalCode ?? '';
+    String street = placemark.street ?? '';
+    String adminArea = placemark.subAdministrativeArea ?? '';
     String name = placemark.name ?? '';
     String locality = placemark.locality ?? '';
     String administrativeArea = placemark.administrativeArea ?? '';
     String country = placemark.country ?? '';
-    return "$name, $locality, $administrativeArea, $country";
+    return "Sub-face: $subFace,\n "
+        "Street: $street,\n "
+        "Name: $name,\n "
+        "Fare: $fare,\n "
+        "Sub-locality: $subLocality,\n "
+        "Locality: $locality,\n "
+        "Sub-admin Area: $adminArea\n "
+        "Admin Area: $administrativeArea,\n "
+        "Country: $country,\n "
+        "Postal Code: $postal,\n "
+        "ISO Code:  $isoCode,\n ";
   }
 
   String locationName = "";
@@ -97,7 +116,9 @@ class _GetLocationState extends State<GetLocation> {
                 'Timestamp: ${_currentPosition?.timestamp == null ? "Null" : _currentPosition!.timestamp.toString()}'),
             const SizedBox(height: 12),
             Text(
-                'Location: $locationName'),
+              locationName,
+              style: Theme.of(context).textTheme.headline6,
+            ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () async {
