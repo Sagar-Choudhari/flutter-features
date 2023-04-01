@@ -34,15 +34,35 @@ dependencies:
 #  for notification badge
   awesome_notifications: ^0.7.4+1
   http: ^0.13.5
+
+#  for splash screen animation
   lottie: ^2.3.1
+
+#  for shared preferences
   shared_preferences: ^2.0.20
   intl: ^0.17.0
+
+#  for firebase
   cloud_firestore: ^4.4.5
   firebase_core: ^2.8.0
+
+#  for data table
   data_table_2: ^2.4.1
+
+#  to create odf
   pdf: ^3.10.1
+
+#  to get a path to save pdf files
   path_provider: ^2.0.14
-  url_launcher: ^6.1.10
+
+#  to view pdf
+  syncfusion_flutter_pdfviewer: ^21.1.37
+
+#  to open downloaded pdf file
+  open_filex: ^4.3.2
+
+#  to handle device permissions
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:

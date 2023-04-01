@@ -9,19 +9,12 @@ import 'features/note.dart';
 import 'features/shared_preferences.dart';
 
 void main() async {
-
-  // Always initialize Awesome Notifications
-
-  // WidgetsFlutterBinding.ensureInitialized();
   await NotificationController.initializeLocalNotifications();
-  // await Firebase.initializeApp();
-
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -53,30 +46,24 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-
 class _MyHomePageState extends State<MyHomePage> {
-
-
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initializeFirebase();
   }
 
-Future<void> _initializeFirebase() async {
-  try {
-    await Firebase.initializeApp();
-    print("Firebase initialized successfully");
-  } catch (e) {
-    print("Error initializing Firebase: $e");
+  Future<void> _initializeFirebase() async {
+    try {
+      await Firebase.initializeApp();
+      debugPrint("Firebase initialized successfully");
+    } catch (e) {
+      debugPrint("Error initializing Firebase: $e");
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('widget.title'),
@@ -141,4 +128,3 @@ Future<void> _initializeFirebase() async {
     );
   }
 }
-

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'AppData.dart';
+import 'appdata.dart';
 
 class TablePdf extends StatefulWidget {
   const TablePdf({Key? key}) : super(key: key);
@@ -32,12 +32,6 @@ class _TablePdfState extends State<TablePdf> {
     _loadDataFromSharedPreferences();
   }
 
-/*  final String name = '';
-  final String gender = '';
-  final String dob = '';
-  final String phone = '';
-  final String address = '';*/
-
   CollectionReference users = FirebaseFirestore.instance.collection('appData');
 
   Future<void> addData(AppData appData) async {
@@ -45,18 +39,6 @@ class _TablePdfState extends State<TablePdf> {
     appData.id = docUser.id;
     final json = appData.toJson();
     await docUser.set(json);
-
-    // var id = users
-    // return users
-    //     .add({
-    //       'name': appData.name,
-    //       'gender': appData.gender,
-    //       'dob': appData.dob,
-    //       'phone': appData.phone,
-    //       'address': appData.address
-    //     })
-    //     .then((value) => debugPrint("User Added"))
-    //     .catchError((error) => debugPrint("Failed to add user: $error"));
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -92,7 +74,6 @@ class _TablePdfState extends State<TablePdf> {
                         child: _genders.isEmpty
                             ? const CircularProgressIndicator()
                             : DropdownButtonFormField<String>(
-                                // value: _selectedGender,
                                 hint: const Text('Select Item'),
                                 borderRadius: BorderRadius.circular(15),
                                 elevation: 10,
@@ -119,22 +100,18 @@ class _TablePdfState extends State<TablePdf> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
                         controller: tDateInput,
-                        //editing controller of this TextField
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            icon:
-                                Icon(Icons.calendar_today), //icon of text field
-                            labelText: "Enter Date" //label text of field
-                            ),
+                            icon: Icon(Icons.calendar_today),
+                            labelText: "Enter Date"),
                         readOnly: true,
-                        //set it true, so that user will not able to edit text
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
                               firstDate: DateTime(1950),
                               //DateTime.now() - not to allow to choose before today.
-                              lastDate: DateTime(2100));
+                              lastDate: DateTime.now());
 
                           if (pickedDate != null) {
                             debugPrint(pickedDate.toString());
@@ -214,14 +191,16 @@ class _TablePdfState extends State<TablePdf> {
               ),
             ),
             ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: MediaQuery.of(context).size.width / 9)),
-                onPressed: () {
-                  _getNewDataFromFirestore();
-                },
-                child: const Text('Download to Shared Preferences & show it in table')),
+              style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: MediaQuery.of(context).size.width / 9)),
+              onPressed: () {
+                _getNewDataFromFirestore();
+              },
+              child: const Text(
+                  'Download to Shared Preferences & show it in table'),
+            ),
           ],
         ),
       ),
@@ -282,44 +261,24 @@ class _TablePdfState extends State<TablePdf> {
       await prefs.setStringList(data.id,
           [data.name, data.gender, data.dob, data.phone, data.address]);
     }
-
-    // debugPrint('saveToShared::::: ${appdata.phone.toString()}');
-    // await prefs.setStringList(appdata.id, appdata);
-    // _loadNewDataFromSharedPreferences(appdata);
   }
-  // Future<void> _loadNewDataFromSharedPreferences(AppData appdata) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   // final data = prefs.getStringList('genders');
-  //   // debugPrint('loadFromShare::::: ${data.toString()}');
-  //   final List<AppData> appDataList = [appdata];
-  //   for (final aPPData in appDataList) {
-  //     final data1 = prefs.getStringList(aPPData.id);
-  //     debugPrint('loadFromShare::::: ${data1.toString()}');
-  //   }
-  // }
+  /*Future<void> _loadNewDataFromSharedPreferences(AppData appdata) async {
+    final prefs = await SharedPreferences.getInstance();
+    // final data = prefs.getStringList('genders');
+    // debugPrint('loadFromShare::::: ${data.toString()}');
+    final List<AppData> appDataList = [appdata];
+    for (final aPPData in appDataList) {
+      final data1 = prefs.getStringList(aPPData.id);
+      debugPrint('loadFromShare::::: ${data1.toString()}');
+    }
+  }*/
 
   gotoTable(List<AppData> appdata1) {
-    // Navigator.push(context,
-    //     MaterialPageRoute(builder: (BuildContext context) {
-    //   return const LoadData();
-    // }));
     debugPrint('gotoTable run');
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => TableData(title: 'App Data', appdata: appdata1)));
-    // runApp(MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   home: TableData(
-    //     title: 'App Data',
-    //     appdata: appdata1,
-    //   ),
-    // ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                TableData(title: 'App Data', appdata: appdata1)));
   }
-
-/*
-  Stream<List<AppData>> readData() => FirebaseFirestore.instance
-      .collection('appData')
-      .snapshots()
-      .map((snapshot) =>
-      snapshot.docs.map((doc) => AppData.fromJson(doc.data())).toList());
-*/
 }

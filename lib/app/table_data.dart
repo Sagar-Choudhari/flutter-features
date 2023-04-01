@@ -1,11 +1,12 @@
-
+import 'package:features/app/pdf.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:url_launcher/url_launcher.dart';
-import 'AppData.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'appdata.dart';
 import 'package:path_provider/path_provider.dart';
 
 class TableData extends StatefulWidget implements PreferredSizeWidget {
@@ -36,6 +37,7 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    requestPermissions();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -51,32 +53,27 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
     super.dispose();
   }
 
-/*  void _onSearchTap() {
-    setState(() {
-      if (_animationController.isCompleted) {
-        _animationController.reverse();
-      } else {
-        _animationController.forward();
-      }
-    });
-  }*/
+  void requestPermissions() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.storage,
+    ].request();
+    debugPrint('Location:: ${statuses[Permission.location].toString()}');
+    debugPrint('Storage:: ${statuses[Permission.storage].toString()}');
+  }
 
   List<AppData> _getTableData() {
-    // filter the data by the search query
     List<AppData> filteredData = widget.appdata.where((data) {
       return data.name
           .toLowerCase()
           .contains(_searchTextController.text.toLowerCase());
     }).toList();
 
-    // calculate the start and end indices of the current page
     int startIndex = _currentPage * rowsPerPage;
     int endIndex = startIndex + rowsPerPage;
 
-    // make sure the end index doesn't exceed the length of the data list
     endIndex = endIndex > filteredData.length ? filteredData.length : endIndex;
 
-    // slice the data list to get the current page's data
     List<AppData> pageData = filteredData.sublist(startIndex, endIndex);
 
     return pageData;
@@ -92,77 +89,29 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
         title: _isSearching ? _buildSearchField() : Text(widget.title),
         actions: _buildAppBarActions(),
         automaticallyImplyLeading: false,
-        /*
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: SizeTransition(
-            sizeFactor: _animationController,
-            axisAlignment: -1,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _searchTextController,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 100),
-                    hintText: 'Search',
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchTextController.clear();
-                        setState(() {
-                          _filteredDataList = widget.appdata;
-                        });
-                      },
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _filteredDataList = widget.appdata
-                          .where((data) =>
-                              data.name
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.gender
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.dob
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.phone
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.address
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()))
-                          .toList();
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),*/
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
-        // generatePdf(widget.appdata);
             final file = await generatePdf(widget.appdata);
-            // await launchUrl(Uri.parse(file.path));
 
             final String filePath = file.absolute.path;
             final Uri uri = Uri.file(filePath);
 
-            if (!File(uri.toFilePath()).existsSync()) {
-              throw Exception('$uri does not exist!');
-            }
-            if (!await launchUrl(uri)) {
-              throw Exception('Could not launch $uri');
-            }
+            Fluttertoast.showToast(
+              msg: "PDF is downloaded successfully to '$filePath'",
+              toastLength: Toast.LENGTH_LONG,
+            );
+            debugPrint(file.toString());
+            debugPrint(filePath);
+            debugPrint(uri.toString());
 
-      },
-      child: const Icon(Icons.picture_as_pdf)),
+            if (await file.exists()) {
+              gotoNext(filePath);
+            } else {
+              debugPrint("File does not exist!");
+            }
+          },
+          child: const Icon(Icons.picture_as_pdf)),
       body: SingleChildScrollView(
         child: PaginatedDataTable(
           // header: const Text('App Data'),
@@ -181,7 +130,6 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
           ),
           onPageChanged: (value) {
             setState(() {
-              // _currentPage = value;
               _getTableData();
             });
           },
@@ -250,12 +198,16 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
     );
   }
 
+  void gotoNext(String filePath) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PdfViewer(filePath)));
+  }
 
   Future<File> generatePdf(List<AppData> dataList) async {
-
     final pdf = pw.Document();
 
-    final ByteData fontData = await rootBundle.load('assets/Caveat-Regular.ttf');
+    final ByteData fontData =
+        await rootBundle.load('assets/Caveat-Regular.ttf');
 
     final ttf = pw.Font.ttf(ByteData.view(fontData.buffer));
 
@@ -265,30 +217,34 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
           return pw.Column(
             children: [
               // Add a header to the page
-              pw.Text('App Data', style: pw.TextStyle(fontSize: 20,font: ttf)),
+              pw.Text('App Data', style: pw.TextStyle(fontSize: 20, font: ttf)),
               pw.SizedBox(height: 20),
 
               pw.Table.fromTextArray(
                 context: context,
                 data: [
                   ['Name', 'Gender', 'DOB', 'Phone', 'Address'],
-                  ...dataList.map((data) => [data.name, data.gender, data.dob, data.phone, data.address]),
+                  ...dataList.map((data) => [
+                        data.name,
+                        data.gender,
+                        data.dob,
+                        data.phone,
+                        data.address
+                      ]),
                 ],
               ),
             ],
           );
-        }
-    ));
+        }));
 
     final String? downloadDir = await getDownloadPath();
     final file = File("$downloadDir/appData.pdf");
     await file.writeAsBytes(await pdf.save());
 
-    debugPrint(downloadDir);
+    debugPrint('Saved at: $file');
 
     return file;
   }
-
 
   Future<String?> getDownloadPath() async {
     Directory? directory;
@@ -299,14 +255,17 @@ class _TableDataState extends State<TableData> with TickerProviderStateMixin {
         directory = Directory('/storage/emulated/0/Download');
         // Put file in global download folder, if for an unknown reason it didn't exist, we fallback
         // ignore: avoid_slow_async_io
-        if (!await directory.exists()) directory = await getExternalStorageDirectory();
+        if (!await directory.exists()) {
+          directory = await getExternalStorageDirectory();
+        }
       }
     } catch (err, stack) {
       debugPrint("Cannot get download folder path");
+      debugPrint(err.toString());
+      debugPrint(stack.toString());
     }
     return directory?.path;
   }
-
 }
 
 class _AppDataSource extends DataTableSource {
@@ -341,62 +300,3 @@ class _AppDataSource extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
-
-/*title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _onSearchTap,
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: SizeTransition(
-            sizeFactor: _animationController,
-            axisAlignment: -1,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _searchTextController,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 100),
-                    hintText: 'Search',
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchTextController.clear();
-                        setState(() {
-                          _filteredDataList = widget.appdata;
-                        });
-                      },
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _filteredDataList = widget.appdata
-                          .where((data) =>
-                              data.name
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.gender
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.dob
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.phone
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()) ||
-                              data.address
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()))
-                          .toList();
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),*/

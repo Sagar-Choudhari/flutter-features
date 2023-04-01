@@ -67,7 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '407507047827',
     projectId: 'features-f3fad',
     storageBucket: 'features-f3fad.appspot.com',
-    iosClientId: '407507047827-4h2hvi3sj0f4vuo2n734r87djgojaqkh.apps.googleusercontent.com',
+    iosClientId:
+        '407507047827-4h2hvi3sj0f4vuo2n734r87djgojaqkh.apps.googleusercontent.com',
     iosBundleId: 'com.example.features',
   );
 
@@ -77,7 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '407507047827',
     projectId: 'features-f3fad',
     storageBucket: 'features-f3fad.appspot.com',
-    iosClientId: '407507047827-4h2hvi3sj0f4vuo2n734r87djgojaqkh.apps.googleusercontent.com',
+    iosClientId:
+        '407507047827-4h2hvi3sj0f4vuo2n734r87djgojaqkh.apps.googleusercontent.com',
     iosBundleId: 'com.example.features',
   );
 }

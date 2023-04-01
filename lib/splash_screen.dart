@@ -19,10 +19,6 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: (5)),
       vsync: this,
     );
-    // Timer(
-    //     const Duration(seconds: 3),
-    //     () => Navigator.pushReplacement(context,
-    //         MaterialPageRoute(builder: (context) => const MyHomePage())));
   }
 
   @override
@@ -41,8 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
               ..duration = composition.duration
               ..forward().whenComplete(() => Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const MyHomePage()),
+                    MaterialPageRoute(builder: (context) => const MyHomePage()),
                   ));
           },
         ),

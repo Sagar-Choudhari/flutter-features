@@ -10,7 +10,6 @@ class CheckImei extends StatefulWidget {
 }
 
 class _CheckImeiState extends State<CheckImei> {
-
   String imei = "";
   Map<String, dynamic> data = {'': ''};
   bool isPhysicalDevice = false;
@@ -31,7 +30,7 @@ class _CheckImeiState extends State<CheckImei> {
       tags = "",
       type = "";
 
-  var version;
+  var version = '';
   List<String> supported32BitAbis = [],
       supported64BitAbis = [],
       supportedAbis = [],
@@ -85,10 +84,9 @@ class _CheckImeiState extends State<CheckImei> {
       systemFeatures = androidInfo.systemFeatures;
       tags = androidInfo.tags;
       type = androidInfo.type;
-      version = androidInfo.version as AndroidBuildVersion;
+      version = androidInfo.version as String;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +113,6 @@ class _CheckImeiState extends State<CheckImei> {
                 height: 10,
               ),
               Text('IMEI: $imei\n'),
-
               const SizedBox(
                 height: 10,
               ),

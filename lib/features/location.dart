@@ -117,7 +117,7 @@ class _GetLocationState extends State<GetLocation> {
             const SizedBox(height: 12),
             Text(
               locationName,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
             ElevatedButton(

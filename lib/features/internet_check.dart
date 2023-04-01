@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
-
 class InternetCheck extends StatefulWidget {
   const InternetCheck({super.key});
 
@@ -12,7 +11,6 @@ class InternetCheck extends StatefulWidget {
 }
 
 class _InternetCheckState extends State<InternetCheck> {
-
   Map _source = {ConnectivityResult.none: false};
   final MyConnectivity _connectivity = MyConnectivity.instance;
 
@@ -21,7 +19,7 @@ class _InternetCheckState extends State<InternetCheck> {
     super.initState();
     _connectivity.initialise();
     _connectivity.myStream.listen((source) {
-      if(mounted){
+      if (mounted) {
         setState(() => _source = source);
       }
     });
@@ -33,7 +31,6 @@ class _InternetCheckState extends State<InternetCheck> {
     super.dispose();
   }
 
-
   Future<bool> hasNetwork() async {
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -42,11 +39,11 @@ class _InternetCheckState extends State<InternetCheck> {
       return false;
     }
   }
+
   bool isOnline = false;
 
   @override
   Widget build(BuildContext context) {
-
     String string;
     switch (_source.keys.toList()[0]) {
       case ConnectivityResult.mobile:
@@ -80,7 +77,6 @@ class _InternetCheckState extends State<InternetCheck> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-
           isOnline = await hasNetwork();
 
           try {
@@ -98,13 +94,11 @@ class _InternetCheckState extends State<InternetCheck> {
     );
   }
 
-  void showToast(String message){
+  void showToast(String message) {
     var snackBar = SnackBar(content: Text(message));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
-
-
 
 class MyConnectivity {
   MyConnectivity._();

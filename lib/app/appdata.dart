@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final appData = appDataFromJson(jsonString);
-
 import 'dart:convert';
 
 AppData appDataFromJson(String str) => AppData.fromJson(json.decode(str));
@@ -26,20 +22,20 @@ class AppData {
   String address;
 
   factory AppData.fromJson(Map<String, dynamic> json) => AppData(
-    id: json["id"],
-    name: json["name"],
-    gender: json["gender"],
-    dob: json["dob"],
-    phone: json["phone"],
-    address: json["address"],
-  );
+        id: json["id"],
+        name: json["name"],
+        gender: json["gender"],
+        dob: json["dob"],
+        phone: json["phone"],
+        address: json["address"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "gender": gender,
-    "dob": dob,
-    "phone": phone,
-    "address": address,
-  };
+        "id": id,
+        "name": name,
+        "gender": gender,
+        "dob": dob,
+        "phone": phone,
+        "address": address,
+      };
 }
